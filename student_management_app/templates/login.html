@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %} 
+
+{% block content %}
+
+    <body class="hold-transition login-page">
+<div class="login-box">
+  <div class="login-logo">
+	
+<div class="image">
+            <img src='../../static/dist/img/AdminLTELogo.png' class="img-circle elevation-2" alt="piet Image">
+          </div>
+    <a href="{% url 'login' %}"><b> QUT</b><br> سیستم مدیریت حضور و غیاب دانشجویان صنعتی قم</a>
+  </div>
+  <!-- /.login-logo -->
+  <div class="card">
+    <div class="card-body login-card-body">
+      <p class="login-box-msg">ورود به پنل کاربری</p>
+
+      <form action="{% url 'doLogin' %}" method="POST">
+      {% csrf_token %}
+        <div class="input-group mb-3">
+          <input type="email" class="form-control" placeholder="ایمیل" name="email">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-envelope"></span>
+            </div>
+          </div>
+        </div>
+        <div class="input-group mb-3">
+          <input type="password" class="form-control" placeholder="گذرواژه" name="password">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-lock"></span>
+            </div>
+          </div>
+        </div>
+
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary btn-block">ورود</button>
+          </div>
+
+          {% comment %} <div class="col-12 text-center">
+            <a href="{% url 'password_reset' %}">Reset Password</a>
+          </div>  {% endcomment %}
+
+          {% comment %} Display Messages {% endcomment %}
+          {% if messages %}
+          <div class="col-12">
+            {% for message in messages %}
+              {% if message.tags == "error" %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                  {{ message }}
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <!-- /.col -->
+        </div>
+      </form>
+
+
+  </div>
+</div>
+<br><br>
+<footer>
+  <strong>&copy; {% now "Y" %}, کلیه حقوق مادی و معنوی این وب سایت متعلق به <a href="https://qut.ac.ir/">دانشگاه صنعتی قم</a> می‌ باشد.</strong>  
+      <br>
+      <div style="text-align:center;">
+        توسعه و طراحی توسط <a href="https://github.com/Amirreza-Jabbari"> امیررضا جباری </a>
+      </div>
+    </footer>
+<!-- /.login-box -->
+
+{% endblock %}

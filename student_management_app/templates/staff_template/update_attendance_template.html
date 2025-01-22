@@ -1,0 +1,300 @@
+{% extends 'staff_template/base_template.html' %}
+
+{% block page_title %}
+    به روز رسانی حضور و غیاب
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+
+<section class="content">
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- general form elements -->
+                    <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">مشاهده ی پنل به روز رسانی حضور و غیاب</h3>
+                    </div>
+                    <!-- /.card-header -->
+
+                                {% comment %} Display Messages {% endcomment %}
+                                {% if messages %}
+                                <div class="form-group">
+                                <div class="col-12">
+                                    {% for message in messages %}
+                                    {% if message.tags == "error" %}
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                    {% elif message.tags == "success" %}
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                                </div>
+                                {% endif %}
+                            
+
+                        <div class="card-body">
+                           
+                            <div class="form-group">
+                                <label>واحد درسی </label>
+                                <select class="form-control" name="subject" id="subject">
+                                    {% for subject in subjects %}
+                                        <option value="{{ subject.id }}">{{ subject.subject_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>ترم تحصیلی </label>
+                                <select class="form-control" name="session_year_id" id="session_year_id">
+                                    {% for session_year in session_years %}
+                                        <option value="{{ session_year.id }}">{{ session_year.session_start_year }} to {{ session_year.session_end_year }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+
+                        </div>
+                        <!-- /.card-body -->
+
+                        <div class="card-footer">
+                            <button type="button" class="btn btn-primary" id="fetch_attendance">بارگزاری تاریخچه حضور و غیاب</button>
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="form-group" id="attendance_block" style="display:none;">
+                                    <label>تاریخ حضور و غیاب </label>
+                                    <select class="form-control" name="attendance_date" id="attendance_date">
+                                        
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="alert alert-danger" id="error_attendance" style="display:none;">
+
+                                </div>
+
+                                <div class="alert alert-success" id="success_attendance" style="display:none;">
+                                    
+                                </div>
+                            </div>
+
+                            <div class="card-footer" id="fetch_student_block" style="display:none;">
+
+                                <button type="button" class="btn btn-primary" id="fetch_student">بارگزاری وضعیت دانشجویان</button>
+                            </div>
+                            
+                            <!-- /.card-body -->
+
+                            {% comment %} <div class="card-footer">
+                                <button type="button" class="btn btn-primary" id="save_student">Save Data</button>
+                            </div> {% endcomment %}
+
+                        </div>
+
+                        {% comment %} Displaying Students Here {% endcomment %}
+
+                        <div class="card-footer" id="student_data">
+                        </div> 
+
+                    </div>
+                    <!-- /.card -->
+
+                </div>
+            </div>
+
+        </div><!-- /.container-fluid -->
+      </section>
+
+  {% endblock main_content %}
+
+{% block custom_js %}
+
+<script>
+    $(document).ready(function(){
+        
+
+        //Fetching Attendance Date
+
+        $("#fetch_attendance").click(function(){
+                var subject = $("#subject").val()
+                var session_year_id = $("#session_year_id").val()
+                //console.log(subject)
+                //console.log(session_year_id)
+
+                $.ajax({
+                    url:'{% url 'get_attendance_dates' %}',
+                    type:'POST',
+                    data:{subject:subject, session_year_id:session_year_id},
+                })
+
+                
+                .done(function(response){
+                    var json_data = JSON.parse(response);
+                    if(json_data.length>0)
+                    {
+                        var html_data = "";
+                        for (key in json_data)
+                        {
+                            html_data+="<option value='"+ json_data[key]["id"] +"'>"+ json_data[key]["attendance_date"] +"</option>"
+                        }
+                        $("#error_attendance").html("");
+                        $("#error_attendance").hide();
+                        $("#attendance_block").show();
+                        $("#fetch_student_block").show();
+                        $("#attendance_date").html(html_data);
+                        //console.log(response)
+                        //alert("Something")
+                    }
+                    else
+                    {
+                        $("#error_attendance").html("No Attendance Data Found.");
+                        $("#error_attendance").show();
+                        $("#attendance_block").hide();
+                        $("#fetch_student_block").hide();
+                        $("#attendance_date")="" //Empty the Date Dropdown also
+                    }
+                    
+                })
+
+                .fail(function(){
+                    alert("Error in getting Attendance Dates.")
+                    $("#error_attendance").html("");
+                    $("#fetch_student_block").hide();
+                    $("#attendance_block").hide();
+                });
+
+                
+        })
+
+        // Now Working on Fetch Student after attendance date selected
+        $("#fetch_student").click(function(){
+
+            // Displaying Students Based on Staff, Course and Session Enrolled
+
+            //var subject=$("#subject").val()
+            //var session_year=$("#session_year").val()
+            var attendance_date=$("#attendance_date").val()
+
+            $.ajax({
+                url:'{% url 'get_attendance_student' %}',
+                type:'POST',
+                data:{attendance_date:attendance_date},
+            })
+
+            
+            .done(function(response) {
+                var json_data = JSON.parse(response);
+                console.log(json_data);
+
+                // Create a table structure for the student data
+                var table_data = "<div class='form-group'><label>حضور و غیاب دانشجویان: </label></div>";
+                table_data += "<table class='table table-bordered table-striped'>";
+                table_data += "<thead><tr><th>#</th><th>نام دانشجو</th><th>وضعیت</th><th>حاضر / غایب</th></tr></thead>";
+                table_data += "<tbody>";
+
+                for (key in json_data) {
+                    table_data += "<tr>";
+                    table_data += "<td>" + (parseInt(key) + 1) + "</td>";
+                    table_data += "<td>" + json_data[key]['name'] + "</td>";
+                    table_data += "<td><input type='checkbox' name='student_data[]' value='" + json_data[key]['id'] + "' " +
+                                  (json_data[key]['status'] ? "checked='checked'" : "") + " /></td>";
+
+                    // Displaying Present and Absent
+                    if (json_data[key]['status']) {
+                        table_data += "<td><b>[ حاضر ]</b></td>";
+                    } else {
+                        table_data += "<td><b>[ غایب ]</b></td>";
+                    }
+
+                    table_data += "</tr>";
+                }
+
+                table_data += "</tbody></table>";
+
+                // Add the save button below the table
+                table_data += "<div class='form-group'>";
+                table_data += "<button id='save_attendance' class='btn btn-success' type='button'>ذخیره تغییرات</button>";
+                table_data += "</div>";
+
+                $("#student_data").html(table_data);
+            })
+            .fail(function(){
+                alert("خطا در دریافت اطلاعات دانشجویان.")
+            })
+
+
+
+            // Save Attendance Data to Database
+            $(document).on("click", "#save_attendance", function(){
+                
+                //Disabling the Button while data is being saved in Server
+                $(this).attr("disabled", "disabled")
+                $(this).text("در حال ذخیره اطلاعات حضور و غیاب...")
+
+                //console.log("SAVE")
+                var student_data=$("input[name='student_data[]'").map(function(){ 
+                        if($(this).is(":checked")){
+                            return {"id":$(this).val(), "status":1}; // Getting ID and Value of Students
+                        }
+                        else
+                        {
+                            return {"id":$(this).val(), "status":0}; // Getting ID and Value of Students
+                        }
+                    }).get()
+
+                var attendance_date=$("#attendance_date").val();
+                
+                
+                student_data = JSON.stringify(student_data)
+                //console.log(student_data);
+
+                // Saving Attendance Data into Database
+
+                $.ajax({
+                    url:'{% url 'update_attendance_data' %}',
+                    type:'POST',
+                    data:{student_ids:student_data, attendance_date:attendance_date},
+                })
+
+                
+                .done(function(response){
+                    
+                    if(response=="OK")
+                    {
+                        alert("تعییرات با موفقیت ذخیره شد")
+                    }
+                    else
+                    {
+                        alert("خطا در ذخیره ی تغییرات")
+                    }
+                    location.reload()
+                    
+                    //console.log(response)
+                })
+
+                .fail(function(){
+                    alert("خطا در ذخیره ی تغییرات")
+                })
+
+            })
+
+        })
+
+    })
+</script>
+{% endblock custom_js %}

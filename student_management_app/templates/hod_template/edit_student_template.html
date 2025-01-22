@@ -1,0 +1,27 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    ویرایش دانشجو | نام کاربری: {{ username }} | #شناسه : {{ id }}
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">ویرایش اطلاعات دانشجو</h3>
+                    </div>
+                    {% url 'edit_student_save' as action_path %}
+                    {% include 'hod_template/form_template.html' with messages=messages form=form action_path=action_path button_text="به روز رسانی اطلاعات دانشجو" %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock main_content %}
