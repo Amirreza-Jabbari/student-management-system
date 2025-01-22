@@ -1,5 +1,5 @@
 asgiref==3.2.10
-Django==3.0.7
+Django==5.1.1
 mysql-connector-python==8.0.20
 pyparsing==2.4.7
 pytz==2020.1
