@@ -1,0 +1,31 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    مدیریت حضور و غیاب اساتید
+{% endblock page_title %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">مدیریت حضور و غیاب اساتید</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <a href="{% url 'take_staff_attendance' %}" class="btn btn-primary">ثبت حضور و غیاب</a>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="{% url 'staff_attendance_view' %}" class="btn btn-success">مشاهده حضور و غیاب</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock main_content %}

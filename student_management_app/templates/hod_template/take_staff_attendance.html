@@ -1,0 +1,90 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    ثبت حضور و غیاب اساتید
+{% endblock page_title %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">ثبت حضور و غیاب اساتید</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>تاریخ حضور و غیاب</label>
+                            <input type="date" id="attendance_date" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>شماره</th>
+                                        <th>نام استاد</th>
+                                        <th>حضور</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for staff in staffs %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ staff.admin.first_name }} {{ staff.admin.last_name }}</td>
+                                        <td>
+                                            <input type="checkbox" 
+                                                   name="staff_attendance" 
+                                                   value="{{ staff.admin.id }}" 
+                                                   class="staff-checkbox" 
+                                                   checked>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="save_attendance">ذخیره</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock main_content %}
+{% block custom_js %}
+<script>
+    $(document).ready(function() {
+        $("#save_attendance").click(function() {
+            var attendance_date = $("#attendance_date").val();
+            var staff_data = [];
+
+            $(".staff-checkbox").each(function() {
+                staff_data.push({
+                    id: $(this).val(),
+                    status: $(this).is(":checked") // true if checked, false if not
+                });
+            });
+
+            $.ajax({
+                url: '{% url "save_staff_attendance" %}',
+                type: 'POST',
+                data: {
+                    'staff_data': JSON.stringify(staff_data),
+                    'attendance_date': attendance_date,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}' // Include CSRF token
+                },
+                success: function(response) {
+                    alert("حضور و غیاب با موفقیت ثبت شد");
+                    location.reload(); // Reload the page to see updated data
+                },
+                error: function(xhr) {
+                    alert("خطا در ثبت حضور و غیاب: " + xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
+{% endblock custom_js %}

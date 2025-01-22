@@ -1,0 +1,140 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    افزودن استاد
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">افزودن استاد</h3>
+                    </div>
+                    <form role="form" method="POST" action="{% url 'add_staff_save' %}">
+                        {% csrf_token %}
+                        {% if messages %}
+                        <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                {% if message.tags == "error" %}
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                {% elif message.tags == "success" %}
+                                <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>ایمیل</label>
+                                <input type="email" class="form-control" name="email" id="id_email">
+                            </div>
+                            <div class="form-group">
+                                <label>نام کاربری</label>
+                                <input type="text" class="form-control" name="username" id="id_username">
+                            </div>
+                            <div class="form-group">
+                                <label>گذرواژه</label>
+                                <input type="password" class="form-control" name="password">
+                            </div>
+                            <div class="form-group">
+                                <label>نام</label>
+                                <input type="text" class="form-control" name="first_name">
+                            </div>
+                            <div class="form-group">
+                                <label>نام خانوادگی</label>
+                                <input type="text" class="form-control" name="last_name">
+                            </div>
+                            <div class="form-group">
+                                <label>آدرس</label>
+                                <textarea class="form-control" name="address"></textarea>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">افزودن استاد</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock main_content %}
+
+{% block custom_js %}
+<script>
+    $(document).ready(function(){
+        $("#id_email").keyup(function(){
+            var email = $(this).val();
+            if(email!=""){
+                $.ajax({
+                    url : '{% url 'check_email_exist' %}',
+                    type : 'POST',
+                    data : {email:email}
+                })
+                .done(function(response){
+                    if(response == "True"){
+                        $(".email_error").remove();
+                        $("<span class='email_error' style='color: red; padding: 5px; font-weight: bold;'> ایمیل قبلا ثبت شده است. </span>").insertAfter("#id_email")
+                    }
+                    else{
+                        $(".email_error").remove();
+                        $("<span class='email_error' style='color: green; padding: 5px; font-weight: bold;'> ایمیل قابل ثبت. </span>").insertAfter("#id_email")
+                    }
+                })
+                .fail(function(){
+                    console.log("Failed");
+                })
+            }
+            else{
+                $(".email_error").remove();
+            }
+        });
+
+        $("#id_username").keyup(function(){
+            var username = $(this).val();
+            if(username!=""){
+                $.ajax({
+                    url : '{% url 'check_username_exist' %}',
+                    type : 'POST',
+                    data : {username:username}
+                })
+                .done(function(response){
+                    if(response == "True"){
+                        $(".username_error").remove();
+                        $("<span class='username_error' style='color: red; padding: 5px; font-weight: bold;'> نام کاربری قبلا ثبت شده است. </span>").insertAfter("#id_username")
+                    }
+                    else{
+                        $(".username_error").remove();
+                        $("<span class='username_error' style='color: green; padding: 5px; font-weight: bold;'> نام کاربری قابل ثبت. </span>").insertAfter("#id_username")
+                    }
+                })
+                .fail(function(){
+                    console.log("Failed");
+                })
+            }
+            else{
+                $(".username_error").remove();
+            }
+        });
+    });
+</script>
+{% endblock custom_js %}
