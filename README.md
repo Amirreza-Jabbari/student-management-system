@@ -26,7 +26,7 @@
 
 1. **کلون کردن مخزن**:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Amirreza-Jabbari/student-management-system.git
    cd student_management_system
    ```
 
