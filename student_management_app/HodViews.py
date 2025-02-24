@@ -942,14 +942,14 @@ def save_staff_attendance(request):
         return HttpResponse("Invalid Method")
     
     try:
-        # دریافت اطلاعات حضور و غیاب ارسال شده
+        # Receive sent attendance information
         staff_data = request.POST.get('staff_data')
         attendance_date = request.POST.get('attendance_date')
 
-        # تبدیل رشته JSON به لیست دیکشنری‌ها (هر دیکشنری شامل id، time_slot و status)
+        # Convert JSON string to list of dictionaries (each dictionary contains id, time_slot and status)
         staff_data = json.loads(staff_data)
 
-        # ثبت یا به‌روزرسانی حضور و غیاب برای هر رکورد
+        # Record or update attendance for each record
         for record in staff_data:
             staff = Staffs.objects.get(admin_id=record['id'])
             
