@@ -1,7 +1,7 @@
 {% extends 'hod_template/base_template.html' %}
 
 {% block page_title %}
-    ثبت حضور و غیاب اساتید
+    ثبت حضور و غیاب اساتید (ساعتی)
 {% endblock page_title %}
 
 {% block main_content %}
@@ -11,7 +11,7 @@
             <div class="col-md-12">
                 <div class="card card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">ثبت حضور و غیاب اساتید</h3>
+                        <h3 class="card-title">ثبت حضور و غیاب اساتید (ساعتی)</h3>
                     </div>
                     <div class="card-body">
                         <div class="form-group">
@@ -25,7 +25,12 @@
                                     <tr>
                                         <th>شماره</th>
                                         <th>نام استاد</th>
-                                        <th>حضور</th>
+                                        <th>تایم 1</th>
+                                        <th>تایم 2</th>
+                                        <th>تایم 3</th>
+                                        <th>تایم 4</th>
+                                        <th>تایم 5</th>
+                                        <th>تایم 6</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -35,10 +40,39 @@
                                         <td>{{ staff.admin.first_name }} {{ staff.admin.last_name }}</td>
                                         <td>
                                             <input type="checkbox" 
-                                                   name="staff_attendance" 
-                                                   value="{{ staff.admin.id }}" 
+                                            class="staff-checkbox" 
+                                            data-staff-id="{{ staff.admin.id }}" 
+                                            data-time-slot="1">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" 
                                                    class="staff-checkbox" 
-                                                   checked>
+                                                   data-staff-id="{{ staff.admin.id }}" 
+                                                   data-time-slot="2">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" 
+                                                   class="staff-checkbox" 
+                                                   data-staff-id="{{ staff.admin.id }}" 
+                                                   data-time-slot="3">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" 
+                                                   class="staff-checkbox" 
+                                                   data-staff-id="{{ staff.admin.id }}" 
+                                                   data-time-slot="4">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" 
+                                                   class="staff-checkbox" 
+                                                   data-staff-id="{{ staff.admin.id }}" 
+                                                   data-time-slot="5">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" 
+                                                   class="staff-checkbox" 
+                                                   data-staff-id="{{ staff.admin.id }}" 
+                                                   data-time-slot="6">
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -54,6 +88,7 @@
     </div>
 </section>
 {% endblock main_content %}
+
 {% block custom_js %}
 <script>
     $(document).ready(function() {
@@ -63,8 +98,9 @@
 
             $(".staff-checkbox").each(function() {
                 staff_data.push({
-                    id: $(this).val(),
-                    status: $(this).is(":checked") // true if checked, false if not
+                    id: $(this).data('staff-id'),
+                    time_slot: $(this).data('time-slot'),
+                    status: $(this).is(":checked")
                 });
             });
 
@@ -74,11 +110,11 @@
                 data: {
                     'staff_data': JSON.stringify(staff_data),
                     'attendance_date': attendance_date,
-                    'csrfmiddlewaretoken': '{{ csrf_token }}' // Include CSRF token
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
                 },
                 success: function(response) {
                     alert("حضور و غیاب با موفقیت ثبت شد");
-                    location.reload(); // Reload the page to see updated data
+                    location.reload();
                 },
                 error: function(xhr) {
                     alert("خطا در ثبت حضور و غیاب: " + xhr.responseText);

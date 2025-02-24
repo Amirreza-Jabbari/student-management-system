@@ -1,7 +1,7 @@
 {% extends 'hod_template/base_template.html' %}
 
 {% block page_title %}
-    مشاهده حضور و غیاب اساتید
+    مشاهده حضور و غیاب اساتید (ساعتی)
 {% endblock page_title %}
 
 {% block main_content %}
@@ -11,7 +11,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">حضور و غیاب اساتید</h3>
+                        <h3 class="card-title">حضور و غیاب اساتید (ساعتی)</h3>
                     </div>
                     <div class="card-body">
                         <div class="form-group">
@@ -25,7 +25,7 @@
                         <button class="btn btn-primary" id="filter_attendance">فیلتر</button>
                     </div>
                     <div class="card-body" id="attendance_data">
-                        <!-- Attendance data will be populated here -->
+                        <!-- اطلاعات حضور و غیاب اینجا نمایش داده می‌شود -->
                     </div>
                 </div>
             </div>
@@ -47,12 +47,12 @@
                 data: {
                     'start_date': start_date,
                     'end_date': end_date,
-                    'csrfmiddlewaretoken': '{{ csrf_token }}' // Include CSRF token
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
                 },
                 success: function(response) {
-                    var html_data = "<table class='table table-bordered'><thead><tr><th>نام استاد</th><th>تاریخ</th><th>وضعیت</th></tr></thead><tbody>";
+                    var html_data = "<table class='table table-bordered'><thead><tr><th>نام استاد</th><th>تاریخ</th><th>تایم</th><th>وضعیت</th></tr></thead><tbody>";
                     $.each(response.data, function(index, attendance) {
-                        html_data += "<tr><td>" + attendance.staff_name + "</td><td>" + attendance.date + "</td><td>" + attendance.status + "</td></tr>";
+                        html_data += "<tr><td>" + attendance.staff_name + "</td><td>" + attendance.date + "</td><td>" + attendance.time_slot + "</td><td>" + attendance.status + "</td></tr>";
                     });
                     html_data += "</tbody></table>";
                     $("#attendance_data").html(html_data);

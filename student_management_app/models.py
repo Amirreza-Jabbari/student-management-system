@@ -162,13 +162,15 @@ class StaffAttendance(models.Model):
     id = models.AutoField(primary_key=True)
     staff_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)
     attendance_date = models.DateField()
-    status = models.BooleanField(default=False)  # True for present, False for absent
+    time_slot = models.IntegerField(default=1)  # فیلد جدید: شماره تایم (مثلاً 1 تا 6)
+    status = models.BooleanField(default=False)  # True برای حضور، False برای غیاب
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
     class Meta:
-        unique_together = ('staff_id', 'attendance_date')
+        unique_together = ('staff_id', 'attendance_date', 'time_slot')
+
 
 #Creating Django Signals
 

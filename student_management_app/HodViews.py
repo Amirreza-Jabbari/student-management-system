@@ -942,27 +942,26 @@ def save_staff_attendance(request):
         return HttpResponse("Invalid Method")
     
     try:
-        # Get staff attendance data
+        # دریافت اطلاعات حضور و غیاب ارسال شده
         staff_data = request.POST.get('staff_data')
         attendance_date = request.POST.get('attendance_date')
 
-        # Parse staff data
+        # تبدیل رشته JSON به لیست دیکشنری‌ها (هر دیکشنری شامل id، time_slot و status)
         staff_data = json.loads(staff_data)
 
-        # Save attendance for each staff
-        for staff_info in staff_data:
-            staff = Staffs.objects.get(admin_id=staff_info['id'])
+        # ثبت یا به‌روزرسانی حضور و غیاب برای هر رکورد
+        for record in staff_data:
+            staff = Staffs.objects.get(admin_id=record['id'])
             
-            # Check if attendance for this staff and date already exists
             attendance, created = StaffAttendance.objects.get_or_create(
                 staff_id=staff,
                 attendance_date=attendance_date,
-                defaults={'status': staff_info['status']}
+                time_slot=record['time_slot'],
+                defaults={'status': record['status']}
             )
             
-            # If not created, update the existing record
             if not created:
-                attendance.status = staff_info['status']
+                attendance.status = record['status']
                 attendance.save()
 
         return HttpResponse("OK")
@@ -985,17 +984,16 @@ def staff_attendance_filter(request):
         end_date = request.POST.get('end_date')
         
         try:
-            # Filter staff attendance based on date range
             staff_attendances = StaffAttendance.objects.filter(
                 attendance_date__range=[start_date, end_date]
             ).order_by('-attendance_date')
             
-            # Prepare data for JSON response
             attendance_data = []
             for attendance in staff_attendances:
                 attendance_data.append({
                     'staff_name': f"{attendance.staff_id.admin.first_name} {attendance.staff_id.admin.last_name}",
                     'date': str(attendance.attendance_date),
+                    'time_slot': attendance.time_slot,
                     'status': 'حاضر' if attendance.status else 'غایب'
                 })
             
